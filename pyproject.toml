@@ -13,6 +13,8 @@ main = "qtest.main:main"
 python = "^3.12"
 qiskit = "^1.1.0"
 click = "^8.1.7"
+qiskit-aer = "^0.14.1"
+qiskit-ibm-runtime = "^0.23.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.4.2"
