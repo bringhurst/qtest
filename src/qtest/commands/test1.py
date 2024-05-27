@@ -1,8 +1,10 @@
 import click
 import numpy as np
 from qiskit import QuantumCircuit  # type: ignore
+from qiskit.primitives import Estimator, EstimatorResult  # type: ignore
 from qiskit.primitives.sampler import Sampler  # type: ignore
 from qiskit.primitives.sampler import PrimitiveJob, SamplerResult
+from qiskit.quantum_info import SparsePauliOp  # type: ignore
 
 
 @click.group()
@@ -37,8 +39,28 @@ def run() -> None:
         # Execute using the Sampler primitive
         sampler: Sampler = Sampler()
 
-        job: PrimitiveJob[SamplerResult] = sampler.run(circuits=qc_measured, shots=1000)
+        sampled_job: PrimitiveJob[SamplerResult] = sampler.run(
+            circuits=qc_measured, shots=1000
+        )
 
-        result: SamplerResult = job.result()
+        sampled_result: SamplerResult = sampled_job.result()
 
-        click.echo(message=f"Quasi probability distribution: {result.quasi_dists}")
+        click.echo(
+            message=f"Quasi probability distribution: {sampled_result.quasi_dists}"
+        )
+
+    # Define the observable to be measured
+    operator: SparsePauliOp = SparsePauliOp.from_list(
+        obj=[("XXY", 1), ("XYX", 1), ("YXX", 1), ("YYY", -1)]
+    )
+
+    # Execute using the Estimator primitive
+    estimator: Estimator = Estimator()
+
+    estimated_job: PrimitiveJob[EstimatorResult] = estimator.run(
+        circuits=qc_example, observables=operator, shots=1000
+    )
+
+    estimated_result: SamplerResult = estimated_job.result()
+
+    click.echo(message=f"Expectation values: {estimated_result.values}")
